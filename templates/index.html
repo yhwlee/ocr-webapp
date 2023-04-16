@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>OCR App</title>
+        <link rel="stylesheet" type="text/css" href="/static/index.css">
+    </head>
+    <body>
+        <h1>OCR App</h1>
+        <form action="/api/v1/extract_text" method="post" enctype="multipart/form-data">
+            <input type="file" name="Images" multiple>
+            <button type="submit">Extract Text</button>
+        </form>
+    </body>
+</html>
