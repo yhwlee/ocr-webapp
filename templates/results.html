@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>OCR Results</title>
+        <link rel="stylesheet" type="text/css" href="/static/results.css">
+    </head>
+    <body>
+        <h1>OCR Results</h1>
+        <table>
+            <tr>
+                <th>Image Filename</th>
+                <th>Extracted Text</th>
+            </tr>
+            {% for filename, text in response.items() if filename != "Time Taken" %}
+            <tr>
+                <td>{{ filename }}</td>
+                <td>{{ text }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <!-- We provide an id so that we can use it in css file -->
+        <p id="time-taken">Time Taken: {{ response["Time Taken"] }} seconds</p>
+    </body>
+</html>
