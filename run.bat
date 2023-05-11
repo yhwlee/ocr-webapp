@@ -18,7 +18,7 @@ echo.
 
 :: Check if necessary components exist
 echo Checking necessary components...
-for %%f in (app.py requirements.txt packages\* Input\* Output\* src\SickO.py) do (
+for %%f in (app.py requirements.txt packages\* Input\* Output\* src\SickOO.py) do (
     if not exist %%f (
         echo Missing component: %%f
         echo Please make sure all components of the SICKO folder are correctly placed.
@@ -29,16 +29,35 @@ for %%f in (app.py requirements.txt packages\* Input\* Output\* src\SickO.py) do
 :: Create a virtual environment and activate it
 echo Creating a virtual environment...
 python -m venv virtualenv
+if %errorlevel% neq 0 (
+    echo Virtual environment creation failed.
+    exit /b
+)
 call .\virtualenv\Scripts\activate.bat
 
 :: Install the necessary packages from the local directory
 echo Installing necessary packages...
 pip install --no-index --find-links=packages -r requirements.txt
+if %errorlevel% neq 0 (
+    echo Package installation failed.
+    exit /b
+)
+
+:: Check if Flask is installed
+flask --version | findstr /R /C:"Flask .*">nul
+if %errorlevel% neq 0 (
+    echo Flask installation failed.
+    exit /b
+)
 
 :: Run the Flask app
 echo Running the Flask app...
 set FLASK_APP=app.py
-start cmd /k "flask run"
+flask run
+if %errorlevel% neq 0 (
+    echo Flask app failed to start.
+    exit /b
+)
 
 echo.
 echo === SICKO Web Application Setup Complete ===
@@ -46,6 +65,8 @@ echo.
 
 :: Display the link to access the webapp
 echo You can access the web application by opening your web browser and navigating to http://localhost:5000
+echo Please keep this window open while using the application.
 
 :: The script will keep running until the user closes it manually
-pause
+echo Press any key to stop the server and exit.
+pause >nul
