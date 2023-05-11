@@ -71,6 +71,15 @@ if exist .\virtualenv (
     )
 }
 
+:: Add Scripts directory to PATH if it's not already there
+set VENV_PATH=%CD%\virtualenv\Scripts
+echo %PATH% | findstr /C:"%VENV_PATH%">nul
+if %errorlevel% neq 0 (
+    echo Adding virtual environment's Scripts directory to PATH...
+    set PATH=%VENV_PATH%;%PATH%
+)
+
+
 :: Run the Flask app
 echo Running the Flask app...
 set FLASK_APP=app.py
