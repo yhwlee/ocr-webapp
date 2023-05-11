@@ -26,29 +26,50 @@ for %%f in (app.py requirements.txt packages\* Input\* Output\* src\SickOO.py) d
     )
 )
 
-:: Create a virtual environment and activate it
-echo Creating a virtual environment...
-python -m venv virtualenv
-if %errorlevel% neq 0 (
-    echo Virtual environment creation failed.
-    exit /b
-)
-call .\virtualenv\Scripts\activate.bat
+:: Check if the virtual environment already exists
+if exist .\virtualenv (
+    echo Virtual environment found...
 
-:: Install the necessary packages from the local directory
-echo Installing necessary packages...
-pip install --no-index --find-links=packages -r requirements.txt
-if %errorlevel% neq 0 (
-    echo Package installation failed.
-    exit /b
-)
+    :: Check if activation script exists
+    if not exist .\virtualenv\Scripts\activate.bat (
+        echo Virtual environment is corrupted. Please delete the "virtualenv" directory and rerun this script.
+        echo Full Path: %CD%\virtualenv
+        exit /b
+    )
 
-:: Check if Flask is installed
-flask --version | findstr /R /C:"Flask .*">nul
-if %errorlevel% neq 0 (
-    echo Flask installation failed.
-    exit /b
-)
+    :: Activate the virtual environment
+    echo Activating existing virtual environment...
+    call .\virtualenv\Scripts\activate.bat
+
+    :: Loop through the requirements.txt and install missing libraries
+    echo Checking and installing missing libraries...
+    for /F "delims=" %%i in (requirements.txt) do (
+        echo Checking library: %%i
+        pip show %%i >nul
+        if %errorlevel% neq 0 (
+            echo Installing: %%i
+            pip install %%i
+        )
+    )
+
+) else {
+    :: Create a new virtual environment and activate it
+    echo Creating a new virtual environment...
+    python -m venv virtualenv
+    if %errorlevel% neq 0 (
+        echo Virtual environment creation failed.
+        exit /b
+    )
+    call .\virtualenv\Scripts\activate.bat
+
+    :: Install the necessary packages from the local directory
+    echo Installing necessary packages...
+    pip install --no-index --find-links=packages -r requirements.txt
+    if %errorlevel% neq 0 (
+        echo Package installation failed.
+        exit /b
+    )
+}
 
 :: Run the Flask app
 echo Running the Flask app...
